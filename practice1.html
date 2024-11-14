@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Information</title>
+    <script src="practice1.js"></script>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: contents;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #0073e6;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="date"] {
+            width: 300px;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #0073e6;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #005bb5;
+        }
+
+        #Tbl_user {
+            width: 80%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #Tbl_user th,
+        #Tbl_user td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        #Tbl_user th {
+            background-color: #0073e6;
+            color: #fff;
+        }
+
+        #Tbl_user tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #Tbl_user tr:hover {
+            background-color: #e1f0ff;
+        }
+
+        #print_data {
+            margin-top: 15px;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>User Information</h1>
+
+    <label for="name">Name:</label>
+    <input type="text" id="name" placeholder="Enter name here">
+    <br>
+    <label for="number">Number:</label>
+    <input type="number" id="number" placeholder="Enter number here">
+    <br>
+    <label for="email">Email:</label>
+    <input type="email" id="email" placeholder="Enter email here">
+    <br>
+    <label for="start_date">Starting Date:</label>
+    <input type="date" id="sdate" placeholder="Enter starting date here">
+    <br>
+    <label for="end_date">Ending Date:</label>
+    <input type="date" id="edate" placeholder="Enter ending date here">
+    <br>
+    <button onclick="fnprint()">Submit</button>
+    <button id="res">Reset</button>
+    <h2 id="print_data"></h2>
+    <br></br>
+    Short By:
+    <select id="dropdown" onchange="sortdata()">
+        <option>Ascending</option>
+        <option>Descending</option>
+    </select>
+
+    <table id="Tbl_user">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Number</th>
+                <th>Email</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Date difference</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        document.getElementById("res").addEventListener("click", Reset);
+
+        function Reset() {
+            document.getElementById("name").value = '';
+            document.getElementById("number").value = '';
+            document.getElementById("email").value = '';
+            document.getElementById("sdate").value = '';
+            document.getElementById("edate").value = '';
+        }
+
+        function fnprint() {
+            const name = document.getElementById("name").value;
+            const number = document.getElementById("number").value;
+            const email = document.getElementById("email").value;
+            const startdate = document.getElementById("sdate").value;
+            const enddate = document.getElementById("edate").value;
+            if (name && number && email && startdate && enddate) {
+                const tbl = document.getElementById("Tbl_user").getElementsByTagName("tbody")[0];
+                const newrow = tbl.insertRow();
+                const datediff =  difference_date(startdate,enddate);
+
+                newrow.insertCell(0).innerText = name;
+                newrow.insertCell(1).innerText = number;
+                newrow.insertCell(2).innerText = email;
+                newrow.insertCell(3).innerText = startdate;
+                newrow.insertCell(4).innerText = enddate;
+                newrow.insertCell(5).innerText = datediff;
+
+                Reset();
+                
+
+            
+
+                const actions = newrow.insertCell(6);
+                actions.innerHTML = `<button onclick="usredit(this)">Edit</button> <button onclick="userdelete(this)">Delete</button>`;
+            } else {
+                alert("Please fill in all fields.");
+            }
+        }
+
+        function userdelete(button) {
+            const row = button.parentNode.parentNode;
+            document.getElementById("Tbl_user").deleteRow(row.rowIndex);
+        }
+
+        function usredit(btn) {
+            const row = btn.parentNode.parentNode;
+
+            document.getElementById("name").value = row.cells[0].innerText;
+            document.getElementById("number").value = row.cells[1].innerText;
+            document.getElementById("email").value = row.cells[2].innerText;
+            document.getElementById("sdate").value = row.cells[3].innerText;
+            document.getElementById("edate").value = row.cells[4].innerText;
+
+            document.querySelector("button[onclick='fnprint()']").onclick = function () {
+                row.cells[0].innerText = document.getElementById("name").value;
+                row.cells[1].innerText = document.getElementById("number").value;
+                row.cells[2].innerText = document.getElementById("email").value;
+                row.cells[3].innerText = document.getElementById("sdate").value;
+                row.cells[4].innerText = document.getElementById("edate").value;
+
+                Reset();
+                document.querySelector("button[onclick]").onclick = fnprint;
+            };
+        }
+
+        function sortdata(){
+            const tbl=document.getElementById("Tbl_user").getElementsByTagName("tbody")[0];
+            const row= Array.from(tbl.rows);
+            const shortorder = document.getElementById("dropdown").value;
+
+        function getdata(row){
+    
+            const dataset = row.cells[3].innerText;
+            return new Date(dataset);
+        }
+            row.sort(function (Ra ,Rb ){
+                const a = getdata(Ra);
+                const b = getdata(Rb);
+
+                if( shortorder === "Ascending"){
+                    return a - b;
+                }
+                else{
+                    return b - a ;           
+                
+                }
+                
+            
+            });
+
+                row.forEach(row => tbl.appendChild(row));
+        }
+        function difference_date(a,b){
+                    const stdate = new Date(a);
+                    const endate = new Date(b);
+            
+                    const diffinmilisec = endate-stdate;
+                    const diffindays = diffinmilisec/(1000 * 60 * 60*24);
+                    return diffindays;
+
+        }
+    </script>
+</body>
+
+</html>
